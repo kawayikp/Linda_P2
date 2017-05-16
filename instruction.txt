@@ -1,0 +1,199 @@
+Yue Liu
+W1168861
+yliu4@scu.edu
+
+
+This Readme file includes
+1. Submission Files
+2. Program Running Instruction
+3. Assumption
+4. Error Handling
+5. Other Feature
+6. Modular design
+7. file/directory organizing
+
+
+=================================================================
+
+- 1 - File included
+Client.java
+HostController.java
+InputOutputController.java
+Message.java
+MessageBuilder.java
+P2.java
+Server.java
+ServerThread.java
+Tuple.java
+
+
+- 2 - How to run the programm
+1> 	SSH to design center
+	ssh yliu3@129.210.16.85
+	ssh yliu3@129.210.16.88
+	ssh yliu3@129.210.16.91
+
+2>	compile 
+	javac *.java
+
+3> 	start the programm in distributed system
+	machine1:	[yliu3@linux60815 P2]$ java P2 h0
+				h0 at 129.210.16.85 : 42301
+
+	machine2:	[yliu3@linux60818 P2]$ java P2 h1
+				h1 at 129.210.16.88 : 39919
+
+	machine3: 	[yliu3@linux60821 P2]$ java P2 h2
+				h2 at 129.210.16.91 : 42833
+
+4> 	select one as the master, and add other hosts
+	machine1	add (h1, 129.210.16.88, 39919) (h2, 129.210.16.91, 42833)
+
+5> 	send requests
+	there are 2 types of request:
+		- 	hosts operation
+			-	add {(<host name>, <IP address>, <port number>)}
+			-	delete {<host name>}
+		- 	tuples operation
+			- 	out(<tuple>): 	add the tuple to a host
+			- 	rd(<tuple>):	read the tuple from a host
+			- 	in(<tuple>):	read and move the tuple from a host
+			->	there are 2 types of <tuple>
+				- 	exact tuple: used for out, rd and in
+				- 	variable type : tuple field with "? variableName : type" 
+					which is used for type variable matching, used for rd and in
+
+6> example
+	- start program
+	machine1:	[yliu3@linux60815 P2]$ java P2 h0
+				h0 at 129.210.16.85 : 42301
+
+	machine2:	[yliu3@linux60818 P2]$ java P2 h1
+				h1 at 129.210.16.88 : 39919
+
+	machine3: 	[yliu3@linux60821 P2]$ java P2 h2
+				h2 at 129.210.16.91 : 42833
+
+	- select master and add hosts
+	machine1	add (h1, 129.210.16.88, 39919) (h2, 129.210.16.91, 42833)
+
+	- tuple operation
+		- out tuple
+		machine1/2/3 	linda>out (1)
+
+		- read tuple
+		machine1/2/3 	linda>rd (1)
+
+		- get tuple
+		machine1/2/3 	linda>in (1)
+
+		- read tuple with type match
+		machine1/2/3 	linda>rd (?i:int)      
+
+		- get tuple with type match
+		machine1/2/3 	linda>in (?i:int)
+
+	-	reboot
+		kill machine3:		machine3	control + c
+		reboot machine3:	machine3	[yliu3@linux60821 P2]$ java P2 h2
+
+	-	add hosts
+		machine4		[yliu3@linux60824 P2]$ java P2 h4
+						h4 at 129.210.16.94 : 35690
+		machine1/2/3	add (h4, 129.210.16.94,35690) 
+
+	-	delete hosts
+		machine1/2/3/4	delete(h1,h2)
+
+	- display 
+		-	display hosts in Linda distributed system
+		machine3/4 		linda>n
+
+		- 	display tuples stored in the host
+		machine3/4		linda>t
+
+
+- 3 -  Assumption
+1>	Linda system has at least 2 hosts which means we can only do add host operation at beginning and we can't delete hosts when there is only 2 hosts in Linda
+
+2>	Only hosts which belongs to a Linda system can add other host(s) which isn't in any Linda system
+
+3>	Replica is 2 which means at most 1 host crashes at one time
+
+4>	we can only do tuple opeartion when 1 host is crashed
+
+5>	We assume there isn't any tuple operation is runing When starting any host operation
+
+
+- 4 - Error Handling
+	There are 3 types of error: 
+
+1> 	command error: if the command is not included in add, delete, out, rd, in, n, and t, the system will prompt again
+
+2> 	tuple error: if the tuple format is not correct, the system will prompt again
+	e.g.
+		-	Correct		(1, 2.2, "abc")
+						(?i:int, ?xx:FLOAT, ?YY:String)
+						()
+		-	wrong		others
+					
+3> 	host error
+	-	if the host name, IP or port is not correct, the sytem will cancel the request and prompt again
+		e.g.
+		-	Correct		(h1, 192.168.1.129, 5000)
+		-	wrong		(, 192.168.1.129, 5000)
+						(h1, 300.168.1.129, 5000)
+						(h1, 192.168.1.129, 500)
+	-	host error in runtime
+		-	hostname is wrong:	skip
+		-	can't connect to host:	skip
+		-	delete hosts when there are only 2 hosts in Linda:	cancel
+		-	start tuple operation when there is only 1 hosts in linda: 	cancel
+
+- 5 - Features
+
+1>	Automatic available port finding
+
+2>	Display output on both server and client window
+
+3>	Compiling without warning messages
+
+4>	Implemented a real O(1/n) algorithm 
+	Only need to update 1/n table and transfer 1/n data when a host join/leave Linda system
+
+5> 	add t and n command
+	- t: output tuple space stored in the machine
+	- n: output all hosts info 
+
+
+- 6 - Modular design
+1>	P2:	programm main class
+	includes a server and a client
+
+2>	Server: listenning on the socket
+	creats new server threads whenever there is a new request from clients
+
+3>	Client: sending request
+	there are 2 types of request: tuple operation and host operation
+
+4> 	Tuple:	Object stored in the distributed system
+
+5>	MessageBuilder: checking input, generating message and pass to client
+
+6>	HostController: handling Linda System constructure updating
+	whenever there is host request(add/delete), there will be a master update the information of the system via the Host Controller 
+
+7>	InputOutputController : handling file operation. 
+	e.g. file creation and file serialization 
+
+
+- 7 - file/directory organizing
+
+1>	/tmp/yliu3/linda/<host_name>/nets.txt
+
+2> 	/tmp/yliu3/linda/<host_name>/tuples_original.txt
+	/tmp/yliu3/linda/<host_name>/tuples_backup.txt
+
+
+
+
