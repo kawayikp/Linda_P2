@@ -5,9 +5,9 @@ Vedio: https://www.youtube.com/watch?v=HUpJr-oQUj0&feature=youtu.be
 
 # System Feature
 - Concurrency
-- scalability
-- fault tolerance
-- transparency
+- Scalability
+- Fault tolerance
+- Transparency
 
 # System Requirement
 https://github.com/kawayikp/Linda_P2/blob/master/p2.pdf
