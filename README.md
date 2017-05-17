@@ -9,7 +9,7 @@ Linda is a distributed P2P system to provide a conceptually “global” tuple s
 - Fault tolerance
 - Transparency
 
-## Vedio
+## Video
 https://www.youtube.com/watch?v=HUpJr-oQUj0&feature=youtu.be
 
 ## System Requirement
