@@ -189,11 +189,6 @@ class Client {
     }
 
     private void rdbroadcastPostwork() {
-        // 不能保证在original和backup都有的情况下，original一定回success,因为虽然out一定是先out给original，再out给backup，但broadcast的顺序是不确定的
-        // e.g
-        // original rdbroadcast + out
-        // backup                       out + rdbroadcast
-        // -> 用rd来保证顺序
         RDBROADCASTMessage m = (RDBROADCASTMessage) messageReceive.poll();
 
         Tuple t = m.getTuple();
