@@ -34,7 +34,7 @@ public class P2 {
     static String tuplesOriginalFile;
     static String tuplesBackupFile;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         if (args.length != 1) {
             System.out.println("Invalid host name, please try again.");
             System.exit(0);
@@ -45,7 +45,13 @@ public class P2 {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         while (true) {
             System.out.print("linda>");
-            String commandLine = br.readLine().trim();
+            String commandLine = "";
+            try {
+                commandLine = br.readLine().trim();
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
             if (commandLine.length() == 0) {
                 continue;
             } else if (commandLine.equals("t")) {
@@ -82,7 +88,7 @@ public class P2 {
     }
 
     // start the host
-    private static void startHost(String hostName) throws Exception {
+    private static void startHost(String hostName) {
         // case1: reboot
         if (InputOutputController.isPathExist(TOP_DIRECTORY)) {
             reboot(hostName);
@@ -93,7 +99,7 @@ public class P2 {
     }
 
     // rebooted host start
-    private static void reboot(String hostName) throws Exception {
+    private static void reboot(String hostName) {
         paths = new String[] { "/tmp/yliu3/", "/tmp/yliu3/linda/", "/tmp/yliu3/linda/" + hostName + "/" };
         netsFile = "nets.txt";
         tuplesOriginalFile = "tuples_original.txt";
@@ -142,7 +148,7 @@ public class P2 {
     }
 
     // new host start
-    private static void InitializeNewHost(String hostName) throws IOException {
+    private static void InitializeNewHost(String hostName) {
         // initialization
         P2.hostName = hostName;
         server = new Server();

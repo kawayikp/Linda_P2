@@ -19,22 +19,37 @@ class InputOutputController {
         return exist;
     }
     
-    static String getFileName(String path) throws Exception {
+    static String getFileName(String path){
         File dir = new File(path);
         File[] fList = dir.listFiles();
         return fList[0].getName();
     }
 
-    static void addFile(String[] paths, String path, String netsFile, String tuplesOriginalFile, String tuplesBackupFile) throws IOException {
+    static void addFile(String[] paths, String path, String netsFile, String tuplesOriginalFile, String tuplesBackupFile){
         File dir = new File(path);
         dir.mkdirs();
 
         dir = new File(path + netsFile);           
-        dir.createNewFile();
+        try {
+            dir.createNewFile();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         dir = new File(path + tuplesOriginalFile);  
-        dir.createNewFile();
+        try {
+            dir.createNewFile();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         dir = new File(path + tuplesBackupFile);   
-        dir.createNewFile();
+        try {
+            dir.createNewFile();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         for (int i = 0; i < paths.length; i++) {
             dir = new File(paths[i]);
